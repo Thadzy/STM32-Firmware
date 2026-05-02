@@ -1,0 +1,61 @@
+version: "3.9"
+
+# =============================================================
+# Base System — Docker Compose
+# =============================================================
+# Services:
+#   frontend  — Web UI (nginx, port 3000)
+#   backend   — Python WebSocket + Modbus bridge (port 8765)
+#
+# Serial port access:
+#   macOS  : set SERIAL_PORT in .env  (e.g. /dev/tty.usbmodem1234)
+#   Windows: set SERIAL_PORT in .env  (e.g. /dev/ttyS2 via WSL2,
+#            or leave blank and specify --port COM3 manually)
+# =============================================================
+
+services:
+
+  # -----------------------------------------------------------
+  # Frontend — static Web UI served by nginx
+  # -----------------------------------------------------------
+  frontend:
+    image: my-frontend:latest          # loaded from frontend-image.tar
+    container_name: basesystem-frontend
+    ports:
+      - "3000:80"
+    restart: unless-stopped
+    depends_on:
+      - backend
+
+  # -----------------------------------------------------------
+  # Backend — Python WebSocket server + Modbus RTU
+  # -----------------------------------------------------------
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: basesystem-backend
+    ports:
+      - "8765:8765"
+    restart: unless-stopped
+
+    # Serial port passthrough
+    # macOS/Linux: mount the host device into the container
+    # Windows:     comment out 'devices' and run backend natively
+    # devices:
+    #   - "${SERIAL_PORT:-/dev/ttyACM0}:${SERIAL_PORT:-/dev/ttyACM0}"
+
+    environment:
+      - SERIAL_PORT=${SERIAL_PORT:-/dev/ttyACM0}
+
+    command: >
+      python main.py
+      --port ${SERIAL_PORT:-/dev/ttyACM0}
+      --ws-port 8765
+
+    # Logging
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"

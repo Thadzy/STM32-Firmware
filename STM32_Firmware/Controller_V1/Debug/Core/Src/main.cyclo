@@ -1,0 +1,10 @@
+../Core/Src/main.c:78:6:Modbus_RxCallback	1
+../Core/Src/main.c:87:6:HAL_UART_ErrorCallback	3
+../Core/Src/main.c:102:6:Timer_PeriodElapsedCallback	3
+../Core/Src/main.c:117:6:Joystick_RxCallback	7
+../Core/Src/main.c:156:5:main	2
+../Core/Src/main.c:239:6:SystemClock_Config	3
+../Core/Src/main.c:285:5:_write	3
+../Core/Src/main.c:298:6:HAL_TIM_PeriodElapsedCallback	2
+../Core/Src/main.c:306:6:HAL_UART_RxCpltCallback	1
+../Core/Src/main.c:313:6:Error_Handler	1
